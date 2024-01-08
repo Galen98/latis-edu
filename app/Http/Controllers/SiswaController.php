@@ -17,7 +17,7 @@ class SiswaController extends Controller
      */
     public function index()
     {
-        $siswa = new SiswaCollection(Siswa::with('lembaga')->paginate(10));
+        $siswa = new SiswaCollection(Siswa::with('lembaga')->paginate(5));
         $lembaga = Lembaga::get();
         return Inertia::render('Dashboard',[
             'title' => 'Dashboard',
@@ -90,7 +90,22 @@ class SiswaController extends Controller
     public function update(Request $request, Siswa $siswa)
     {
         $siswa = Siswa::find($request->id);
-
+        if($request->nis == $siswa->nis){
+        Validator::make($request->all(), [
+            'nama' => ['required'],
+            'email' => 'required | email',
+            'lembaga_id' => ['required'],
+            'foto' => 'max:100',
+        ])->validate();
+        } else{
+            Validator::make($request->all(), [
+                'nama' => ['required'],
+                'email' => 'required | email',
+                'lembaga_id' => ['required'],
+                'foto' => 'max:100',
+                'nis' => 'required|numeric|unique:siswas'
+            ])->validate();
+        }
         $siswa->update([
             'nama' => $request->nama,
             'email' => $request->email,
